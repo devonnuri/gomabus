@@ -9,6 +9,7 @@ import TabBarIcon from '../components/TabBarIcon';
 import HomeScreen from '../screens/HomeScreen';
 import RouteScreen from '../screens/RouteScreen';
 import SettingsScreen from '../screens/SettingsScreen';
+import BusStopScreen from '../screens/BusStopScreen';
 
 const HomeStack = createStackNavigator({
   Home: HomeScreen
@@ -38,7 +39,7 @@ RouteStack.navigationOptions = {
 };
 
 const BusStopStack = createStackNavigator({
-  Settings: SettingsScreen
+  BusStop: BusStopScreen
 });
 
 BusStopStack.navigationOptions = {

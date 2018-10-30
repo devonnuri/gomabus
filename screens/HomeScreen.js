@@ -76,13 +76,12 @@ export default class HomeScreen extends React.Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    marginTop: 10
+    backgroundColor: '#fff'
   },
   routeSection: {
     flex: 1,
     paddingHorizontal: 30,
-    paddingVertical: 20
+    paddingVertical: 15
   },
   nearStopSection: {
     flex: 1,
