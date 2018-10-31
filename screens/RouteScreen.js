@@ -1,5 +1,16 @@
 import React from 'react';
-import { ScrollView, StyleSheet, View, Text, TextInput } from 'react-native';
+import {
+  Platform,
+  ScrollView,
+  StyleSheet,
+  View,
+  Text,
+  TextInput
+} from 'react-native';
+import { Icon } from 'expo';
+import Card from '../components/Card';
+import axios from 'axios';
+import FormData from 'form-data';
 
 export default class RouteScreen extends React.Component {
   static navigationOptions = {
@@ -8,16 +19,46 @@ export default class RouteScreen extends React.Component {
 
   state = {
     searchRoute: '',
-    searchResult: null
+    searchResult: []
   };
 
   onSearchChange = text => {
-    this.setState({ searchRoute: text });
+    let data = new FormData();
+    data.append('busRoute', text);
+    axios({
+      method: 'post',
+      url: 'http://bis.gongju.go.kr/inq/searchBusRoute.do',
+      data,
+      config: { headers: { 'Content-Type': 'multipart/form-data' } }
+    })
+      .then(response => {
+        const result = response.data.busRouteDetailList.map(e => {
+          const {
+            route_id,
+            route_name,
+            route_direction,
+            route_explain,
+            st_stop_name
+          } = e;
+
+          return {
+            route_id,
+            route_name,
+            route_direction,
+            route_explain,
+            st_stop_name
+          };
+        });
+
+        this.setState({ ...this.state, searchResult: result });
+      })
+      .catch(() => {});
+    this.setState({ ...this.state, searchRoute: text });
   };
 
   render() {
     return (
-      <ScrollView style={styles.container}>
+      <View style={styles.container}>
         <View style={styles.searchSection}>
           <View style={styles.searchBar}>
             <Text style={styles.searchLabel}>버스 번호</Text>
@@ -31,13 +72,47 @@ export default class RouteScreen extends React.Component {
           </View>
         </View>
         <View style={styles.resultSection}>
-          {this.state.searchRoute ? null : (
+          {this.state.searchResult.length > 0 ? (
+            <ScrollView>
+              {this.state.searchResult.map((bus, index) => (
+                <Card key={index}>
+                  <View style={styles.routeHeader}>
+                    <Text style={styles.routeName}>{bus.route_name}</Text>
+                    <Text style={styles.routeDirection}>
+                      {bus.route_direction === '1' ? '기점발' : '종점발'}
+                    </Text>
+                  </View>
+                  <View style={styles.routeExplain}>
+                    <Icon.MaterialCommunityIcons
+                      name="routes"
+                      size={18}
+                      style={styles.iconRoute}
+                      color="#333"
+                    />
+                    <Text>{bus.route_explain}</Text>
+                  </View>
+
+                  <View style={styles.routeStop}>
+                    <Icon.Ionicons
+                      name={Platform.OS === 'ios' ? 'ios-bus' : 'md-bus'}
+                      size={18}
+                      style={styles.iconBus}
+                      color="#333"
+                    />
+                    <Text>{bus.st_stop_name}</Text>
+                  </View>
+                </Card>
+              ))}
+            </ScrollView>
+          ) : (
             <View style={styles.noSearch}>
-              <Text>위 입력창에 원하시는 버스 번호를 입력하세요.</Text>
+              <Text style={styles.noSearchText}>
+                위 입력창에 원하시는 버스 번호를 입력하세요.
+              </Text>
             </View>
           )}
         </View>
-      </ScrollView>
+      </View>
     );
   }
 }
@@ -69,11 +144,39 @@ const styles = StyleSheet.create({
     color: '#fff'
   },
   resultSection: {
-    flexGrow: 2,
-    backgroundColor: '#eee'
+    flex: 1,
+    backgroundColor: '#f5f5f5'
   },
   noSearch: {
-    height: 100,
+    flex: 1,
+    justifyContent: 'center',
+    flexDirection: 'column',
     alignItems: 'center'
+  },
+  routeHeader: {
+    flex: 1,
+    flexDirection: 'row',
+    marginBottom: 8
+  },
+  iconRoute: {
+    marginRight: 5
+  },
+  iconBus: {
+    marginRight: 7
+  },
+  routeName: {
+    fontSize: 20,
+    fontWeight: 'bold'
+  },
+  routeDirection: {
+    fontSize: 15,
+    marginLeft: 'auto'
+  },
+  routeExplain: {
+    flexDirection: 'row'
+  },
+  routeStop: {
+    flexDirection: 'row',
+    marginLeft: 3
   }
 });
