@@ -1,9 +1,14 @@
 import React, { Component } from 'react';
-import { StyleSheet, View, Text } from 'react-native';
+import { StyleSheet, TouchableOpacity, Text } from 'react-native';
 
 class Card extends Component {
   render() {
-    return <View style={styles.container}>{this.props.children}</View>;
+    const { children, ...props } = this.props;
+    return (
+      <TouchableOpacity style={styles.container} {...props}>
+        {children}
+      </TouchableOpacity>
+    );
   }
 }
 

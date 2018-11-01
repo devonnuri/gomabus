@@ -7,10 +7,12 @@ import {
   Text,
   TextInput
 } from 'react-native';
+import { StackActions, NavigationActions } from 'react-navigation';
 import { Icon } from 'expo';
 import Card from '../components/Card';
 import axios from 'axios';
 import FormData from 'form-data';
+import RouteDetailScreen from './RouteDetailScreen';
 
 export default class RouteScreen extends React.Component {
   static navigationOptions = {
@@ -22,7 +24,7 @@ export default class RouteScreen extends React.Component {
     searchResult: []
   };
 
-  onSearchChange = text => {
+  _onSearchChange = text => {
     let data = new FormData();
     data.append('busRoute', text);
     axios({
@@ -64,7 +66,7 @@ export default class RouteScreen extends React.Component {
             <Text style={styles.searchLabel}>버스 번호</Text>
             <TextInput
               style={styles.searchInput}
-              onChangeText={this.onSearchChange}
+              onChangeText={this._onSearchChange}
               value={this.state.searchRoute}
               selectionColor="#fff"
               underlineColorAndroid="transparent"
@@ -75,7 +77,12 @@ export default class RouteScreen extends React.Component {
           {this.state.searchResult.length > 0 ? (
             <ScrollView>
               {this.state.searchResult.map((bus, index) => (
-                <Card key={index}>
+                <Card
+                  key={index}
+                  onPress={() => {
+                    this.props.navigation.push('RouteDetail');
+                  }}
+                >
                   <View style={styles.routeHeader}>
                     <Text style={styles.routeName}>{bus.route_name}</Text>
                     <Text style={styles.routeDirection}>
