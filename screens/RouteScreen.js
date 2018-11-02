@@ -1,18 +1,16 @@
 import React from 'react';
 import {
-  Platform,
+  TouchableOpacity,
   ScrollView,
   StyleSheet,
   View,
   Text,
   TextInput
 } from 'react-native';
-import { StackActions, NavigationActions } from 'react-navigation';
+import { Card, CardTitle, CardContent } from 'react-native-cards';
 import { Icon } from 'expo';
-import Card from '../components/Card';
 import axios from 'axios';
 import FormData from 'form-data';
-import RouteDetailScreen from './RouteDetailScreen';
 
 export default class RouteScreen extends React.Component {
   static navigationOptions = {
@@ -27,34 +25,33 @@ export default class RouteScreen extends React.Component {
   _onSearchChange = text => {
     let data = new FormData();
     data.append('busRoute', text);
+
     axios({
       method: 'post',
       url: 'http://bis.gongju.go.kr/inq/searchBusRoute.do',
       data,
       config: { headers: { 'Content-Type': 'multipart/form-data' } }
-    })
-      .then(response => {
-        const result = response.data.busRouteDetailList.map(e => {
-          const {
-            route_id,
-            route_name,
-            route_direction,
-            route_explain,
-            st_stop_name
-          } = e;
+    }).then(response => {
+      const result = response.data.busRouteDetailList.map(e => {
+        const {
+          route_id,
+          route_name,
+          route_direction,
+          route_explain,
+          st_stop_name
+        } = e;
 
-          return {
-            route_id,
-            route_name,
-            route_direction,
-            route_explain,
-            st_stop_name
-          };
-        });
+        return {
+          route_id,
+          route_name,
+          route_direction,
+          route_explain,
+          st_stop_name
+        };
+      });
 
-        this.setState({ ...this.state, searchResult: result });
-      })
-      .catch(() => {});
+      this.setState({ ...this.state, searchResult: result });
+    });
     this.setState({ ...this.state, searchRoute: text });
   };
 
@@ -77,38 +74,24 @@ export default class RouteScreen extends React.Component {
           {this.state.searchResult.length > 0 ? (
             <ScrollView>
               {this.state.searchResult.map((bus, index) => (
-                <Card
+                <TouchableOpacity
                   key={index}
-                  onPress={() => {
-                    this.props.navigation.push('RouteDetail');
-                  }}
+                  onPress={() =>
+                    this.props.navigation.navigate('RouteDetail', {
+                      bus
+                    })
+                  }
                 >
-                  <View style={styles.routeHeader}>
-                    <Text style={styles.routeName}>{bus.route_name}</Text>
-                    <Text style={styles.routeDirection}>
-                      {bus.route_direction === '1' ? '기점발' : '종점발'}
-                    </Text>
-                  </View>
-                  <View style={styles.routeExplain}>
-                    <Icon.MaterialCommunityIcons
-                      name="routes"
-                      size={18}
-                      style={styles.iconRoute}
-                      color="#333"
+                  <Card>
+                    <CardTitle
+                      title={bus.route_name}
+                      subtitle={`${
+                        bus.route_direction === '1' ? '기점발' : '종점발'
+                      } [${bus.route_explain}]`}
                     />
-                    <Text>{bus.route_explain}</Text>
-                  </View>
-
-                  <View style={styles.routeStop}>
-                    <Icon.Ionicons
-                      name={Platform.OS === 'ios' ? 'ios-bus' : 'md-bus'}
-                      size={18}
-                      style={styles.iconBus}
-                      color="#333"
-                    />
-                    <Text>{bus.st_stop_name}</Text>
-                  </View>
-                </Card>
+                    <CardContent text={'현재 정류장: ' + bus.st_stop_name} />
+                  </Card>
+                </TouchableOpacity>
               ))}
             </ScrollView>
           ) : (
@@ -152,7 +135,8 @@ const styles = StyleSheet.create({
   },
   resultSection: {
     flex: 1,
-    backgroundColor: '#f5f5f5'
+    backgroundColor: '#f0f0f0',
+    padding: 10
   },
   noSearch: {
     flex: 1,

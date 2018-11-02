@@ -8,6 +8,7 @@ import {
 import TabBarIcon from '../components/TabBarIcon';
 import HomeScreen from '../screens/HomeScreen';
 import RouteScreen from '../screens/RouteScreen';
+import RouteDetailScreen from '../screens/RouteDetailScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 import BusStopScreen from '../screens/BusStopScreen';
 
@@ -29,9 +30,16 @@ HomeStack.navigationOptions = {
   )
 };
 
-const RouteStack = createStackNavigator({
-  Route: RouteScreen
-});
+const RouteStack = createStackNavigator(
+  {
+    Route: RouteScreen,
+    RouteDetail: RouteDetailScreen
+  },
+  {
+    mode: 'modal',
+    headerMode: 'none'
+  }
+);
 
 RouteStack.navigationOptions = {
   tabBarLabel: '노선',
