@@ -10,23 +10,38 @@ export default class RouteDetailScreen extends React.Component {
   };
 
   state = {
-    data: {}
+    stops: [],
+    buses: []
   };
 
   componentDidMount() {
     BackHandler.addEventListener('hardwareBackPress', this._onBack);
 
-    // let data = new FormData();
-    // data.append('busRouteId', this.props.navigation.state.params.bus);
+    let data = new FormData();
+    const { route } = this.props.navigation.state.params;
+    data.append('busRouteId', route.route_id);
 
-    // axios({
-    //   method: 'post',
-    //   url: 'http://bis.gongju.go.kr/inq/searchBusRouteDetail.do',
-    //   data,
-    //   config: { headers: { 'Content-Type': 'multipart/form-data' } }
-    // }).then(response => {
-    //   this.setState({ data: response.data });
-    // });
+    Promise.all([
+      axios({
+        method: 'post',
+        url: 'http://bis.gongju.go.kr/inq/searchBusRouteDetail.do',
+        data,
+        config: { headers: { 'Content-Type': 'multipart/form-data' } }
+      }),
+      axios({
+        method: 'post',
+        url: 'http://bis.gongju.go.kr/inq/searchBusRealLocationDetail.do',
+        data,
+        config: { headers: { 'Content-Type': 'multipart/form-data' } }
+      })
+    ])
+      .then(([{ data: stops }, { data: buses }]) => {
+        this.setState({
+          stops: stops.busRouteDetailList,
+          buses
+        });
+      })
+      .catch(() => {});
   }
 
   componentWillUnmount() {
@@ -38,18 +53,28 @@ export default class RouteDetailScreen extends React.Component {
   };
 
   render() {
-    const { bus } = this.props.navigation.state.params;
+    const { route } = this.props.navigation.state.params;
 
     return (
       <ScrollView style={styles.container}>
         <Card>
           <CardTitle
-            title={bus.route_name}
-            subtitle={`${bus.route_direction === '1' ? '기점발' : '종점발'} [${
-              bus.route_explain
-            }]`}
+            title={route.route_name}
+            subtitle={`${
+              route.route_direction === '1' ? '기점발' : '종점발'
+            } [${route.route_explain}]`}
           />
-          <CardContent text={'현재 정류장: ' + bus.st_stop_name} />
+          <CardContent text={'현재 정류장: ' + route.st_stop_name} />
+        </Card>
+        <Card>
+          <CardTitle title="버스 노선" />
+          <View>
+            {this.state.stops.map((stop, index) => (
+              <View key={index}>
+                <Text>{stop.stop_name}</Text>
+              </View>
+            ))}
+          </View>
         </Card>
       </ScrollView>
     );

@@ -8,7 +8,6 @@ import {
   TextInput
 } from 'react-native';
 import { Card, CardTitle, CardContent } from 'react-native-cards';
-import { Icon } from 'expo';
 import axios from 'axios';
 import FormData from 'form-data';
 
@@ -73,23 +72,23 @@ export default class RouteScreen extends React.Component {
         <View style={styles.resultSection}>
           {this.state.searchResult.length > 0 ? (
             <ScrollView>
-              {this.state.searchResult.map((bus, index) => (
+              {this.state.searchResult.map((route, index) => (
                 <TouchableOpacity
                   key={index}
                   onPress={() =>
                     this.props.navigation.navigate('RouteDetail', {
-                      bus
+                      route
                     })
                   }
                 >
                   <Card>
                     <CardTitle
-                      title={bus.route_name}
+                      title={route.route_name}
                       subtitle={`${
-                        bus.route_direction === '1' ? '기점발' : '종점발'
-                      } [${bus.route_explain}]`}
+                        route.route_direction === '1' ? '기점발' : '종점발'
+                      } [${route.route_explain}]`}
                     />
-                    <CardContent text={'현재 정류장: ' + bus.st_stop_name} />
+                    <CardContent text={'현재 정류장: ' + route.st_stop_name} />
                   </Card>
                 </TouchableOpacity>
               ))}
