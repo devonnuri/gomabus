@@ -68,13 +68,14 @@ export default class RouteDetailScreen extends React.Component {
         </Card>
         <Card>
           <CardTitle title="버스 노선" />
-          <View>
+          <CardContent>
             {this.state.stops.map((stop, index) => (
-              <View key={index}>
-                <Text>{stop.stop_name}</Text>
+              <View key={index} style={styles.stop}>
+                <Text style={styles.stopName}>{stop.stop_name}</Text>
+                <Text style={styles.stopInfo}>●</Text>
               </View>
             ))}
-          </View>
+          </CardContent>
         </Card>
       </ScrollView>
     );
@@ -85,11 +86,16 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f0f0f0',
-    paddingHorizontal: 10,
-    paddingVertical: 20
+    paddingHorizontal: 10
   },
-  routeName: {
-    fontSize: 30,
-    fontWeight: 'bold'
+  stop: {
+    paddingVertical: 10,
+    paddingHorizontal: 5
+  },
+  stopName: {
+    fontSize: 20
+  },
+  stopInfo: {
+    alignSelf: 'flex-end'
   }
 });
